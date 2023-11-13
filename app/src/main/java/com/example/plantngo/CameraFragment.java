@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -35,7 +36,8 @@ import static android.Manifest.permission.CAMERA;
 public class CameraFragment extends Fragment {
 
     private final int CAMERA_PERMISSION_CODE = 300;
-    private final int RESULT_CAMERA_LOAD_IMG = 1889;
+    private final int RESULT_CAMERA_LOAD_IMG = 1890;
+    private final int RESULT_GALLERY_LOAD_IMG = 1890;
 
     private FrameLayout frameLayout;
     private Activity activity;
@@ -43,17 +45,15 @@ public class CameraFragment extends Fragment {
     private List<String> imagesFilesPaths = new ArrayList<>();
 
     private ImageView photoImageView;
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        return inflater.inflate(R.layout.fragment_camera, container, false);
-//    }
+    private Button galleryButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
         photoImageView = view.findViewById(R.id.photoImageView);
-        // ... (initialize other views and setup)
+        galleryButton = view.findViewById(R.id.galleryButton);
+
+        galleryButton.setOnClickListener(v -> openGallery());
 
         return view;
     }
@@ -144,4 +144,31 @@ public class CameraFragment extends Fragment {
     private void resizeThanLoadImage(String tempImageFilePath, Uri tempImageURI) {
         // Implement the logic to resize and load the image
     }
+
+    private final ActivityResultLauncher<Intent> pickFromGalleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Uri selectedImageUri = data.getData();
+                        // Handle the selected image URI, e.g., load it into an ImageView
+                        displaySelectedImage(selectedImageUri);
+                    }
+                }
+            }
+    );
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("image/*");
+        pickFromGalleryLauncher.launch(galleryIntent);
+    }
+
+    private void displaySelectedImage(Uri imageUri) {
+        // Update your UI to display the selected image, e.g., set it to an ImageView
+        photoImageView.setVisibility(View.VISIBLE);
+        photoImageView.setImageURI(imageUri);
+    }
+
 }
