@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/plant_card"
+    android:backgroundTint="@color/light_green"
+    android:radius="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/plantImageView"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:contentDescription="plant image"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/plantNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="plant name"
+            android:textSize="16sp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/myFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="task" />
+        <!--                https://github.com/markushi/android-circlebutton-->
+        <!--                recycler view.xml(main)->recycle thingy.xml + card view ->item plant.xml (card view)-->
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">PlantNGo</string>
+
+
+    <string name="slogan">Get ready to embark on your \nbotanical adventure with Plant\'NGo!</string>
+
+    <string name="welcome_back">Welcome back!</string>
+    <string name="email">Email</string>
+    <string name="example_gmail">username@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="encrypted_password">******</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">Login</string>
+    <string name="no_account">Don\'t Have an account?</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="or">or</string>
+    <string name="google_login">Login With Google</string>
+    <string name="login_with_google">Login With Google</string>
+    <string name="welcome_image">Welcome image</string>
+    <string name="plantngo_app_icon">PlantNGo app icon</string>
+    <string name="camera">Camera</string>
+    <string name="search">Search</string>
+    <string name="home">Home</string>
+    <string name="community">Community</string>
+    <string name="profile">Profile</string>
+    <string-array name="cat_names">
+        <item>scribble</item>
+        <item>gucci</item>
+        <item>zinc</item>
+        <item>pippin</item>
+        <item>scribble</item>
+        <item>gucci</item>
+        <item>zinc</item>
+        <item>pippin</item>
+    </string-array>
+</resources>
