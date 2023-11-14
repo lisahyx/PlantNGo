@@ -169,6 +169,13 @@ public class CameraFragment extends Fragment {
         // Update your UI to display the selected image, e.g., set it to an ImageView
         photoImageView.setVisibility(View.VISIBLE);
         photoImageView.setImageURI(imageUri);
+        // Now, you can use the selectedImageUri to send the image to the PlantNet API for identification
+        identifyPlant(imageUri);
     }
 
+    private void identifyPlant(Uri imageUri) {
+        // Implement the logic to use PlantNet API with the selected image URI
+        // You can use the provided PlantNetAPIAsyncTask or any other method you prefer
+        new PlantNetAPIAsyncTask().executeAsync(imageUri);
+    }
 }
