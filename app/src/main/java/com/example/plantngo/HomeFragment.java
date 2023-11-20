@@ -1,7 +1,6 @@
 package com.example.plantngo;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +9,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Request;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+
+import retrofit2.Response;
+
 public class HomeFragment extends Fragment {
     public HomeFragment() {
         // Required empty public constructor
@@ -33,13 +34,40 @@ public class HomeFragment extends Fragment {
 
         plantRecyclerView = view.findViewById(R.id.recyclerViewPlants);
         plantRecyclerView.setHasFixedSize(true);
-//        plantRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        plantRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         plantList = new ArrayList<>();
 
-//        parseJSON();
+        //parseJSON();
         return view;
     }
+
+//    private void parseJSON() {
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            JSONArray jsonArray = response.getJSONArray("hits");
+//
+//                            for (int i = 0; i < jsonArray.length(); i++) {
+//                                JSONObject hit = jsonArray.getJSONObject(i);
+//
+//                                String plantName = hit.getString("plant");
+//                                String imageUrl = hit.getString("image");
+//
+//                                plantList.add(new PlantCard(imageUrl, plantName));
+//                            }
+//
+//                            plantAdapter = new PlantRecyclerViewAdapter(getContext(), plantList);
+//                            plantRecyclerView.setAdapter(plantAdapter);
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//    }
 
 
 //    // ArrayList for person names, email Id's and mobile numbers
