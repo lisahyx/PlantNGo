@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     SearchFragment searchFragment = new SearchFragment();
     CameraFragment cameraFragment = new CameraFragment();
 
+    ProfileFragment profileFragment = new ProfileFragment();
+
     private BottomNavigationView.OnItemSelectedListener selectedListener = new BottomNavigationView.OnItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -46,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.content, cameraFragment)
+                        .commit();
+                return true;
+            } else if (item.getItemId() == R.id.profile) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.content, profileFragment)
                         .commit();
                 return true;
             } else {
