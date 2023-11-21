@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:id="@+id/fragment_profile"
-    tools:context=".ProfileFragment">
+    tools:context=".SettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,22 +14,11 @@
         tools:layout_editor_absoluteX="-30dp"
         tools:layout_editor_absoluteY="339dp">
 
-        <ImageButton
-            android:id="@+id/settings_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/settings_foreground"
-            android:layout_gravity="end|top"
-            android:background="@color/background"
-            android:scaleX="0.6"
-            android:scaleY="0.6"
-            android:contentDescription="@string/settings" />
-
         <Button
-            android:id="@+id/logout_button"
+            android:id="@+id/delete_user_button"
             style="@style/CustomButton"
-            android:tag="logout_button"
-            android:text="@string/log_out"/>
+            android:tag="delete_user_button"
+            android:text="Delete Account" />
     </LinearLayout>
 
 </FrameLayout>
