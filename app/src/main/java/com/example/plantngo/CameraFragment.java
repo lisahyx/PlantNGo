@@ -3,7 +3,6 @@ package com.example.plantngo;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -45,6 +44,14 @@ import java.util.Objects;
 
 import static android.Manifest.permission.CAMERA;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import io.grpc.Context;
+
 public class CameraFragment extends Fragment {
 
     public static final int CAMERA_PERM_CODE = 101;
@@ -55,6 +62,7 @@ public class CameraFragment extends Fragment {
     private ImageView selectedImage;
 
     String imagesFilesPaths;
+    StorageReference storageReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,6 +71,8 @@ public class CameraFragment extends Fragment {
         cameraButton = view.findViewById(R.id.cameraButton);
         galleryButton = view.findViewById(R.id.galleryButton);
         selectedImage = view.findViewById(R.id.displayImageView);
+
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,6 +136,8 @@ public class CameraFragment extends Fragment {
                 Uri contentUri = Uri.fromFile(f);
                 mediaScanIntent.setData(contentUri);
                 requireContext().sendBroadcast(mediaScanIntent);
+
+                uploadImageToFirebase(f.getName(), contentUri);
             }
         }
 
@@ -138,6 +150,29 @@ public class CameraFragment extends Fragment {
                 selectedImage.setImageURI(contentUri);
             }
         }
+    }
+
+    private void uploadImageToFirebase(String name, Uri contentUri) {
+        final StorageReference image = storageReference.child("pictures/" + name);
+
+        image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Log.d("tag", "onSuccess: Uploaded Image Uri is" + uri.toString());
+
+                    }
+                });
+                Toast.makeText(getContext(), "Image is Uploaded", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Upload Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private String getFileExt(Uri contentUri) {
