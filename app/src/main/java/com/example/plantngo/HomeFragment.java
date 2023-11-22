@@ -1,6 +1,7 @@
 package com.example.plantngo;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,14 +10,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Request;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.util.ArrayList;
 
-import retrofit2.Response;
+import java.util.ArrayList;
+import java.util.List;
+
+//import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
     public HomeFragment() {
@@ -24,8 +32,9 @@ public class HomeFragment extends Fragment {
     }
 
     private RecyclerView plantRecyclerView;
-    private PlantRecyclerViewAdapter plantAdapter;
-    private ArrayList<PlantCard> plantList;
+    private Adapter plantAdapter;
+    private List<Plant> plants;
+    private static String JSON_URL = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,14 +42,121 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         plantRecyclerView = view.findViewById(R.id.recyclerViewPlants);
-        plantRecyclerView.setHasFixedSize(true);
-        plantRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        plants = new ArrayList<>();
 
-        plantList = new ArrayList<>();
+        //extractPlants();
+        parseLocalJson();
 
-        //parseJSON();
         return view;
     }
+
+    private void parseLocalJson() {
+        JsonReader jsonReader = new JsonReader();
+        String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.api_output);
+        Plant plant = new Plant();
+
+        if (jsonContent != null) {
+            try {
+                JSONArray jsonArray = new JSONArray(jsonContent);
+                //JSONObject jsonObject= new JSONObject(jsonContent);
+
+                if (jsonArray.length() > 0) {
+                    JSONObject firstResult = jsonArray.getJSONObject(0);
+
+                    if (firstResult.has("results")) {
+                        JSONArray resultsArray = firstResult.getJSONArray("results");
+
+                        if (resultsArray.length() > 0) {
+                            JSONObject firstResultObject = resultsArray.getJSONObject(0);
+
+                            if (firstResultObject.has("species")) {
+                                JSONObject speciesObject = firstResultObject.getJSONObject("species");
+
+                                if (speciesObject.has("scientificNameWithoutAuthor")) {
+                                    String scientificName = speciesObject.getString("scientificNameWithoutAuthor");
+
+                                    Log.d("JsonParsing", "Scientific Name Without Author: " + scientificName);
+
+                                    //plant.setPlantName(scientificName);
+                                    plant.plantName = scientificName;
+                                } else {
+                                    Log.d("JsonParsing", "No value for scientificNameWithoutAuthor in species");
+                                }
+                            } else {
+                                Log.d("JsonParsing", "No 'species' key in the result object");
+                            }
+                        } else {
+                            Log.d("JsonParsing", "No results in the array");
+                        }
+                    } else {
+                        Log.d("JsonParsing", "No 'results' key in the first object");
+                    }
+                } else {
+                    Log.d("JsonParsing", "Not enough objects in the array");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        plants.add(plant);
+        plantRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        plantAdapter = new Adapter(requireContext(),plants);
+        plantRecyclerView.setAdapter(plantAdapter);
+    }
+
+
+
+
+    private void extractPlants() {
+        RequestQueue queue = Volley.newRequestQueue(requireContext());
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, JSON_URL, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject plantObject = response.getJSONObject(i);
+
+                        // Get the second object in the "results" array
+                        JSONArray resultsArray = plantObject.getJSONArray("results");
+                        JSONObject speciesResult = resultsArray.getJSONObject(1);
+                        String scientificName = speciesResult.getJSONObject("species")
+                                .getString("scientificNameWithoutAuthor");
+
+                        System.out.println("Scientific Name Without Author: " + scientificName);
+
+                        Plant plant = new Plant();
+                        //plant.setPlantName(plantObject.getString(scientificName));
+                        //plant.setPlantReminders(plantObject.getString("".toString()));
+
+                        // Get the second item in the "query" array
+                        JSONArray queryArray = plantObject.getJSONArray("query");
+                        JSONObject imageResult = queryArray.getJSONObject(1);
+                        JSONObject imageObject = imageResult.getJSONObject("images");
+
+                        //plant.setPlantImageUrl(plantObject.getString(String.valueOf(imageObject)));
+                        plants.add(plant);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                plantRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                plantAdapter = new Adapter(getContext(),plants);
+                plantRecyclerView.setAdapter(plantAdapter);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("tag", "onErrorResponse: " + error.getMessage());
+            }
+        });
+
+        queue.add(jsonArrayRequest);
+
+    }
+
 
 //    private void parseJSON() {
 //        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
