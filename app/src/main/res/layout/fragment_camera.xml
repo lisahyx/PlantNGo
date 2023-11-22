@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:id="@+id/blankFragment"
     tools:context=".CameraFragment">
 
@@ -19,14 +20,18 @@
             android:layout_gravity="center|top"
             android:layout_marginTop="60dp"
             android:contentDescription="photo"
-            android:src="@drawable/camera_background" />
+            app:srcCompat="@android:drawable/gallery_thumb" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-
+            android:gravity="center"
             android:orientation="horizontal">
+
+            <android.widget.Space
+                android:layout_width="30dp"
+                android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/galleryButton"
@@ -37,7 +42,7 @@
                 android:text="Gallery" />
 
             <android.widget.Space
-                android:layout_width="20dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content" />
 
             <Button
@@ -49,16 +54,8 @@
                 android:text="Camera" />
 
             <android.widget.Space
-                android:layout_width="20dp"
+                android:layout_width="30dp"
                 android:layout_height="wrap_content" />
-
-            <Button
-                android:id="@+id/uploadButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="15dp"
-                android:text="Upload" />
         </LinearLayout>
 
     </LinearLayout>
