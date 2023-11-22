@@ -1,18 +1,27 @@
 package com.example.plantngo;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -24,158 +33,152 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import static android.Manifest.permission.CAMERA;
 
 public class CameraFragment extends Fragment {
 
-    private final int CAMERA_PERMISSION_CODE = 300;
-    private final int RESULT_CAMERA_LOAD_IMG = 1890;
-    private final int RESULT_GALLERY_LOAD_IMG = 1890;
+    public static final int CAMERA_PERM_CODE = 101;
+    public static final int CAMERA_REQUEST_CODE = 102;
+    public static final int GALLERY_REQUEST_CODE = 105;
 
-    private FrameLayout frameLayout;
-    private Activity activity;
+    private Button cameraButton, galleryButton;
+    private ImageView selectedImage;
 
-    private List<String> imagesFilesPaths = new ArrayList<>();
-
-    private ImageView photoImageView;
-    private Button galleryButton;
+    String imagesFilesPaths;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
-        photoImageView = view.findViewById(R.id.photoImageView);
-        galleryButton = view.findViewById(R.id.galleryButton);
 
-        galleryButton.setOnClickListener(v -> openGallery());
+        cameraButton = view.findViewById(R.id.cameraButton);
+        galleryButton = view.findViewById(R.id.galleryButton);
+        selectedImage = view.findViewById(R.id.displayImageView);
+
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    askCameraPermissions();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        galleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(gallery, GALLERY_REQUEST_CODE);
+            }
+        });
 
         return view;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        frameLayout = view.findViewById(R.id.blankFragment);
-        takePhotoFromCamera();
-    }
-
-    private void takePhotoFromCamera() {
-        if (ContextCompat.checkSelfPermission(requireContext(), CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if (shouldShowRequestPermissionRationale(CAMERA)) {
-                // Show an explanation to the user
-                // You can use a dialog, Snackbar, or any other UI element to explain the need for the permission.
-            } else {
-                // Request the permission
-                requestCameraPermissionLauncher.launch(CAMERA);
-            }
+    private void askCameraPermissions() throws FileNotFoundException {
+        if ((ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) &&
+            ((ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED))) {
+            requestPermissions(new String[] {android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, CAMERA_PERM_CODE);
         } else {
-            openCameraIntent();
+            takePictureIntent();
         }
     }
 
-    // Use the new ActivityResultLauncher for requesting permissions
-    private final ActivityResultLauncher<String> requestCameraPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            isGranted -> {
-                if (isGranted) {
-                    openCameraIntent();
-                } else {
-                    // Permission not granted, handle accordingly (e.g., show a message)
-                    // You may want to show a Snackbar or a dialog explaining the need for the permission.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if(requestCode == CAMERA_PERM_CODE) {
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    takePictureIntent();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
+            } else {
+                Toast.makeText(getContext(), "Camera Permission Required to Use Camera", Toast.LENGTH_SHORT).show();
             }
-    );
+        }
+    }
 
-    private final ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    // The picture was taken successfully
-                    String tempImageFilePath = imagesFilesPaths.get(imagesFilesPaths.size() - 1);
-                    Uri tempImageURI = Uri.fromFile(new File(tempImageFilePath));
-                    resizeThanLoadImage(tempImageFilePath, tempImageURI);
+    @Override
+    public void onActivityResult (int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode == CAMERA_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK) {
+                File f = new File(imagesFilesPaths);
+                selectedImage.setImageURI(Uri.fromFile(f));
+                Log.d("tag", "Absolute Url of Image is " + Uri.fromFile(f));
 
-                    // Show the captured photo in the ImageView
-                    photoImageView.setVisibility(View.VISIBLE);
-                    photoImageView.setImageURI(tempImageURI);
-                } else {
-                    // Handle the case where the picture was not taken
-                }
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                Uri contentUri = Uri.fromFile(f);
+                mediaScanIntent.setData(contentUri);
+                requireContext().sendBroadcast(mediaScanIntent);
             }
-    );
-
-    private void openCameraIntent() {
-        File photoFile = null;
-        try {
-            photoFile = createImageFile();
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-        if (photoFile != null) {
-            Uri photoURI = FileProvider.getUriForFile(requireContext(), "com.example.plantngo.provider", photoFile);
 
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-
-            takePictureLauncher.launch(takePictureIntent);
+        if(requestCode == GALLERY_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK) {
+                Uri contentUri = data.getData();
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String imageFileName = "IMG_" + timeStamp + "." + getFileExt(contentUri);
+                Log.d("tag", "onActivityResult: Gallery Image Uri: " + imageFileName);
+                selectedImage.setImageURI(contentUri);
+            }
         }
+    }
+
+    private String getFileExt(Uri contentUri) {
+        ContentResolver c = requireContext().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(c.getType(contentUri));
     }
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
         String imageFileName = "IMG_" + timeStamp + "_";
         File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        //File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
-        imagesFilesPaths.add(image.getAbsolutePath());
+        imagesFilesPaths = image.getAbsolutePath();
         return image;
     }
 
-    private void resizeThanLoadImage(String tempImageFilePath, Uri tempImageURI) {
-        // Implement the logic to resize and load the image
-    }
+    private void takePictureIntent() throws FileNotFoundException {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-    private final ActivityResultLauncher<Intent> pickFromGalleryLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        Uri selectedImageUri = data.getData();
-                        // Handle the selected image URI, e.g., load it into an ImageView
-                        displaySelectedImage(selectedImageUri);
-                    }
-                }
+        if(takePictureIntent.resolveActivity(requireActivity().getPackageManager())!=null) {
+            File photoFile = null;
+
+            try {
+                photoFile = createImageFile();
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-    );
 
-    private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryIntent.setType("image/*");
-        pickFromGalleryLauncher.launch(galleryIntent);
-    }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(requireContext(), "com.example.plantngo.provider", photoFile);
 
-    private void displaySelectedImage(Uri imageUri) {
-        // Update your UI to display the selected image, e.g., set it to an ImageView
-        photoImageView.setVisibility(View.VISIBLE);
-        photoImageView.setImageURI(imageUri);
-        // Now, you can use the selectedImageUri to send the image to the PlantNet API for identification
-        identifyPlant(imageUri);
-    }
-
-    private void identifyPlant(Uri imageUri) {
-        // Implement the logic to use PlantNet API with the selected image URI
-        // You can use the provided PlantNetAPIAsyncTask or any other method you prefer
-        new PlantNetAPIAsyncTask().executeAsync(imageUri);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
+            }
+        }
     }
 }
