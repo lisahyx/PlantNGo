@@ -49,6 +49,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import io.grpc.Context;
 
@@ -129,7 +130,7 @@ public class CameraFragment extends Fragment {
         if(requestCode == CAMERA_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK) {
                 File f = new File(imagesFilesPaths);
-                selectedImage.setImageURI(Uri.fromFile(f));
+                //selectedImage.setImageURI(Uri.fromFile(f));
                 Log.d("tag", "Absolute Url of Image is " + Uri.fromFile(f));
 
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -147,7 +148,9 @@ public class CameraFragment extends Fragment {
                 String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                 String imageFileName = "IMG_" + timeStamp + "." + getFileExt(contentUri);
                 Log.d("tag", "onActivityResult: Gallery Image Uri: " + imageFileName);
-                selectedImage.setImageURI(contentUri);
+                //selectedImage.setImageURI(contentUri);
+
+                uploadImageToFirebase(imageFileName, contentUri);
             }
         }
     }
@@ -161,8 +164,7 @@ public class CameraFragment extends Fragment {
                 image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Log.d("tag", "onSuccess: Uploaded Image Uri is" + uri.toString());
-
+                        Picasso.get().load(uri).into(selectedImage);
                     }
                 });
                 Toast.makeText(getContext(), "Image is Uploaded", Toast.LENGTH_SHORT).show();
