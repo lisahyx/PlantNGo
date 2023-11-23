@@ -56,6 +56,12 @@ public class LoginActivity extends AppCompatActivity {
         TextView forgotPasswordTextView = findViewById(R.id.forgotPassword_textView);
         fAuth = FirebaseAuth.getInstance();
 
+        // Check if user is signed in
+        if (fAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
+
         // reset password alert
         reset_alert = new AlertDialog.Builder(this);
         inflater = this.getLayoutInflater();
@@ -177,12 +183,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Your Google Account is Connected to Our Application", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(LoginActivity.this, "Sign In Failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                }).addOnFailureListener(e -> Toast.makeText(LoginActivity.this, "Sign In Failed", Toast.LENGTH_SHORT).show());
             } catch (ApiException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
