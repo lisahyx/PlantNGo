@@ -1,8 +1,10 @@
 package com.example.plantngo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -51,6 +53,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
 import io.grpc.Context;
 
 public class CameraFragment extends Fragment {
@@ -64,6 +68,9 @@ public class CameraFragment extends Fragment {
 
     String imagesFilesPaths;
     StorageReference storageReference;
+
+
+    public String addPlantName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -139,6 +146,20 @@ public class CameraFragment extends Fragment {
                 requireContext().sendBroadcast(mediaScanIntent);
 
                 uploadImageToFirebase(f.getName(), contentUri);
+                PlantNetApiCaller plantAPI = new PlantNetApiCaller(getContext());
+                //plantAPI.identifyPlant(contentUri,,new PlantNetCallback());
+
+                API callApi = new API(getContext());
+                //callApi.sendImageToPlantNet(contentUri);
+
+                JsonReader jsonReader = new JsonReader();
+                String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.api_output);
+                try {
+                    addPlantName = jsonReader.generalParse(jsonContent);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                savePlantToGarden(addPlantName);
             }
         }
 
@@ -217,5 +238,34 @@ public class CameraFragment extends Fragment {
                 startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
             }
         }
+    }
+
+    public void savePlantToGarden(String plantName) {
+        // Create the object of AlertDialog Builder class
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set the message show for the Alert time
+        builder.setMessage("Plant Name: " + plantName);
+
+        // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+        builder.setCancelable(false);
+
+        // Set the positive button with yes name Lambda OnClickListener method is use of DialogInterface interface.
+        builder.setPositiveButton("Add to Garden", (DialogInterface.OnClickListener) (dialog, which) -> {
+            // When the user click yes button then app will close
+            Toast.makeText(getContext(), "Plant Added to Garden", Toast.LENGTH_SHORT).show();
+
+        });
+
+        // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+        builder.setNegativeButton("Cancel", (DialogInterface.OnClickListener) (dialog, which) -> {
+            // If user click no then dialog box is canceled.
+            dialog.cancel();
+        });
+
+        // Create the Alert dialog
+        AlertDialog alertDialog = builder.create();
+        // Show the Alert Dialog box
+        alertDialog.show();
     }
 }

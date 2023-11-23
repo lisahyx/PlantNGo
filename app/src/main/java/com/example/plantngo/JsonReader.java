@@ -1,6 +1,7 @@
 package com.example.plantngo;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,8 +9,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +48,7 @@ public class JsonReader {
         }
     }
 
-    public List<Plant> parseJson(String jsonContent) {
+    public List<Plant> parseJson(Context context, String jsonContent) {
         List<Plant> plants = new ArrayList<>();
 
         if (jsonContent != null) {
@@ -89,6 +95,45 @@ public class JsonReader {
             }
         }
         return plants;
+    }
+
+    private void writeJsonToFile(String filePath, String jsonContent) {
+        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+            outputStream.write(jsonContent.getBytes());
+            Log.d("JsonWriting", "JSON written to file: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String generalParse(String jsonContent) throws JSONException {
+        String scientificName = null;
+
+        if (jsonContent != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(jsonContent);
+
+                if (jsonObject.has("results")) {
+                    JSONArray resultsArray = jsonObject.getJSONArray("results");
+
+                    if (resultsArray.length() > 0) {
+                        JSONObject firstResultObject = resultsArray.getJSONObject(0);
+
+                        if (firstResultObject.has("species")) {
+                            JSONObject speciesObject = firstResultObject.getJSONObject("species");
+
+                            if (speciesObject.has("scientificNameWithoutAuthor")) {
+                                scientificName = speciesObject.getString("scientificNameWithoutAuthor");
+                                return scientificName;
+                            }
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return scientificName;
     }
 }
 
