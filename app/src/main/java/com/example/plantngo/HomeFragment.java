@@ -1,8 +1,6 @@
 package com.example.plantngo;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +8,6 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,19 +34,47 @@ public class HomeFragment extends Fragment {
 
         JsonReader jsonReader = new JsonReader();
         String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.api_output);
-        parseJson(jsonContent);
+        //setRecyclerView(jsonContent);
+
+        sharedPreferencesRecycler();
 
         return view;
     }
 
-    public void parseJson(String jsonContent) {
+    public void setRecyclerView(String jsonContent) {
         JsonReader jsonReader = new JsonReader();
-        List<Plant> parsedPlants = jsonReader.parseJson(jsonContent);
+        List<Plant> parsedPlants = jsonReader.parseGardenPlantsJson(getContext(), jsonContent);
         plants.addAll(parsedPlants);
         plantRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         plantAdapter = new Adapter(requireContext(),plants);
         plantRecyclerView.setAdapter(plantAdapter);
     }
+
+    public void sharedPreferencesRecycler() {
+        // Get plant names from SharedPreferences
+        SharedPreferencesStorage storage = new SharedPreferencesStorage();
+        List<String> plantNames = storage.getPlantNamesFromSharedPreferences(requireContext());
+
+        // Create a list to hold Plant objects
+        List<Plant> plants = new ArrayList<>();
+
+        // Create Plant objects with plant names
+        for (String plantName : plantNames) {
+            Plant plant = new Plant();
+            plant.plantName = plantName;
+            plants.add(plant);
+        }
+
+        // Create and set the adapter
+        Adapter adapter = new Adapter(requireContext(), plants);
+
+        // Assuming plantRecyclerView is the RecyclerView in your layout
+        plantRecyclerView.setAdapter(adapter);
+
+        // Set a LinearLayoutManager
+        plantRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+    }
+
 
 //    private void extractPlants() {
 //        RequestQueue queue = Volley.newRequestQueue(requireContext());

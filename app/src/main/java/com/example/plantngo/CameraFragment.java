@@ -3,14 +3,10 @@ package com.example.plantngo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -20,15 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -36,15 +28,11 @@ import androidx.fragment.app.Fragment;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-
-import static android.Manifest.permission.CAMERA;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,8 +42,6 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
-
-import io.grpc.Context;
 
 public class CameraFragment extends Fragment {
 
@@ -155,11 +141,28 @@ public class CameraFragment extends Fragment {
                 JsonReader jsonReader = new JsonReader();
                 String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.api_output);
                 try {
-                    addPlantName = jsonReader.generalParse(jsonContent);
+                    addPlantName = jsonReader.parsePlantNameJson(jsonContent);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
                 savePlantToGarden(addPlantName);
+
+                // Save plant name
+                SharedPreferencesStorage storage = new SharedPreferencesStorage();
+                // Retrieve existing plant names
+                List<String> retrievedPlantNames = storage.getPlantNamesFromSharedPreferences(requireContext());
+
+                // Add the new plant name to the existing list
+                if (retrievedPlantNames == null) {
+                    retrievedPlantNames = new ArrayList<>();
+                }
+                retrievedPlantNames.add(addPlantName);
+
+                // Save the updated list to SharedPreferences
+                storage.savePlantNamesToSharedPreferences(requireContext(), retrievedPlantNames);
+
+                // Log all plant names
+                storage.displayAllPlantNames(requireContext());
             }
         }
 
