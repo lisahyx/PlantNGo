@@ -3,14 +3,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".HomeFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewPlants"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="30dp"
+        tools:layout_editor_absoluteX="-30dp"
+        tools:layout_editor_absoluteY="339dp">
 
+        <TextView
+            android:id="@+id/daily_plants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daily Plants"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"/>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewPlants"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            tools:layout_editor_absoluteX="-30dp"
+            tools:layout_editor_absoluteY="339dp">
+
+            <TextView
+                android:id="@+id/my_garden"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Garden"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginBottom="15dp"/>
+
+            <View android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floating_action_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:contentDescription="Add Plant"
+                android:src="@drawable/baseline_add_24"
+                android:backgroundTint="@color/light_green"
+                app:fabSize="mini"/>
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewGardenPlants"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+    </LinearLayout>
 </FrameLayout>
