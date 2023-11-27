@@ -3,6 +3,7 @@ package com.example.plantngo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -38,15 +39,32 @@ public class SharedPreferencesStorage {
     }
 
     // Add a new plant name to the existing list in SharedPreferences
-    public void addPlantNameToSharedPreferences(Context context, String newPlantName) {
-        List<String> existingPlantNames = getPlantNamesFromSharedPreferences(context);
+    public void addPlantNameToSharedPreferences(Context context, String plantName) {
+        // Save plant name
+        SharedPreferencesStorage storage = new SharedPreferencesStorage();
 
-        if (existingPlantNames == null) {
-            existingPlantNames = new ArrayList<>();
+        // Retrieve existing plant names
+        List<String> retrievedPlantNames = storage.getPlantNamesFromSharedPreferences(context);
+
+        // Check for duplicates
+        if (retrievedPlantNames != null && retrievedPlantNames.contains(plantName)) {
+            Toast.makeText(context, "Plant name already exists: " + plantName, Toast.LENGTH_SHORT).show();
+        }
+        // Add the new plant name to the existing list
+        else if (retrievedPlantNames == null) {
+            retrievedPlantNames = new ArrayList<>();
+            retrievedPlantNames.add(plantName);
+            Toast.makeText(context, "Plant Added to Garden", Toast.LENGTH_SHORT).show();
+        } else if (retrievedPlantNames != null) {
+            retrievedPlantNames.add(plantName);
+            Toast.makeText(context, "Plant Added to Garden", Toast.LENGTH_SHORT).show();
         }
 
-        existingPlantNames.add(newPlantName);
-        savePlantNamesToSharedPreferences(context, existingPlantNames);
+        // Save the updated list to SharedPreferences
+        storage.savePlantNamesToSharedPreferences(context, retrievedPlantNames);
+
+        // Log all plant names
+        storage.displayAllPlantNames(context);
     }
 
     // Display all plant names stored in SharedPreferences
@@ -57,6 +75,25 @@ public class SharedPreferencesStorage {
             for (String plantName : plantNames) {
                 Log.d("PlantName", plantName);
             }
+        }
+    }
+
+    // Delete a plant name from SharedPreferences
+    public void deletePlantNameFromSharedPreferences(Context context, String plantName) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("PlantPreferences", Context.MODE_PRIVATE);
+
+        // Retrieve the existing list of plant names
+        List<String> plantNames = getPlantNamesFromSharedPreferences(context);
+
+        if (plantNames != null) {
+            // Remove the specified plant name
+            plantNames.remove(plantName);
+
+            // Save the updated list to SharedPreferences
+            savePlantNamesToSharedPreferences(context, plantNames);
+
+            // Log all plant names after deletion
+            displayAllPlantNames(context);
         }
     }
 }
