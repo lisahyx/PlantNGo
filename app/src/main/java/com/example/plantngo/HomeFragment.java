@@ -96,10 +96,15 @@ public class HomeFragment extends Fragment implements RecyclerViewInterface{
     }
 
     @Override
-    public void onItemClick(int position) {
-        // Replace the current fragment with PlantDetailsFragment
+    public void onItemClick(int position, String plantName) {
         PlantDetailsFragment plantDetailsFragment = new PlantDetailsFragment();
 
+        // pass plant name to plant details fragment
+        Bundle bundle = new Bundle();
+        bundle.putString("plantName", plantName);
+        plantDetailsFragment.setArguments(bundle);
+
+        // switch fragments
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.home, plantDetailsFragment);
         transaction.addToBackStack(null);

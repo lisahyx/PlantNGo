@@ -1,6 +1,7 @@
 package com.example.plantngo;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class GardenPlantsAdapter extends RecyclerView.Adapter<GardenPlantsAdapte
     }
 
     @Override
-    public void onItemClick(int position) {
+    public void onItemClick(int position, String plantName) {
 
     }
 
@@ -66,7 +67,8 @@ public class GardenPlantsAdapter extends RecyclerView.Adapter<GardenPlantsAdapte
                         int pos = getAdapterPosition();
 
                         if (pos != RecyclerView.NO_POSITION) {
-                            recyclerViewOnClick.onItemClick(pos);
+                            String plantNameText = plantName.getText().toString();
+                            recyclerViewOnClick.onItemClick(pos, plantNameText);
                         }
                     }
                 }
