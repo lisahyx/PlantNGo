@@ -13,10 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
 public class PlantDetailsFragment extends Fragment {
 
     private ImageView openCalendar;
-    private TextView plantNameView;
+    private TextView plantNameView, sunlightInfo;
 
     public PlantDetailsFragment() {
         // Required empty public constructor
@@ -28,6 +30,7 @@ public class PlantDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_plant_details, container, false);
 
         plantNameView = view.findViewById(R.id.plantNameTextView);
+        sunlightInfo = view.findViewById(R.id.sunlightInfo);
 
         openCalendar = view.findViewById(R.id.calenderImageView);
 
@@ -48,6 +51,23 @@ public class PlantDetailsFragment extends Fragment {
             plantNameView.setText(plantName);
         }
 
+        getSunlight();
+
         return view;
+    }
+
+    public void getSunlight() {
+        JsonReader jsonReader = new JsonReader();
+        String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.plant_care_api_output);
+        if (jsonContent != null) {
+            try {
+                String sunlight = jsonReader.parseSunlightJson(jsonContent);
+                if (sunlight != null) {
+                    sunlightInfo.setText(sunlight);
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

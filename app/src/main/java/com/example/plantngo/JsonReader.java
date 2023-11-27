@@ -1,7 +1,6 @@
 package com.example.plantngo;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -9,13 +8,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,65 +46,7 @@ public class JsonReader {
         }
     }
 
-    public List<Plant> parseJson(Context context, String jsonContent) {
-        List<Plant> plants = new ArrayList<>();
-
-        if (jsonContent != null) {
-            try {
-                JSONArray jsonArray = new JSONArray(jsonContent);
-
-                if (jsonArray.length() > 0) {
-                    JSONObject firstResult = jsonArray.getJSONObject(0);
-
-                    if (firstResult.has("results")) {
-                        JSONArray resultsArray = firstResult.getJSONArray("results");
-
-                        if (resultsArray.length() > 0) {
-                            JSONObject firstResultObject = resultsArray.getJSONObject(0);
-
-                            if (firstResultObject.has("species")) {
-                                JSONObject speciesObject = firstResultObject.getJSONObject("species");
-
-                                if (speciesObject.has("scientificNameWithoutAuthor")) {
-                                    String scientificName = speciesObject.getString("scientificNameWithoutAuthor");
-
-                                    Log.d("JsonParsing", "Scientific Name Without Author: " + scientificName);
-
-                                    Plant plant = new Plant();
-                                    plant.plantName = scientificName;
-                                    plants.add(plant);
-                                } else {
-                                    Log.d("JsonParsing", "No value for scientificNameWithoutAuthor in species");
-                                }
-                            } else {
-                                Log.d("JsonParsing", "No 'species' key in the result object");
-                            }
-                        } else {
-                            Log.d("JsonParsing", "No results in the array");
-                        }
-                    } else {
-                        Log.d("JsonParsing", "No 'results' key in the first object");
-                    }
-                } else {
-                    Log.d("JsonParsing", "Not enough objects in the array");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return plants;
-    }
-
-    private void writeJsonToFile(String filePath, String jsonContent) {
-        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-            outputStream.write(jsonContent.getBytes());
-            Log.d("JsonWriting", "JSON written to file: " + filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String generalParse(String jsonContent) throws JSONException {
+    public String parsePlantNameJson(String jsonContent) throws JSONException {
         String scientificName = null;
 
         if (jsonContent != null) {
@@ -135,5 +75,28 @@ public class JsonReader {
         }
         return scientificName;
     }
+
+    public String parseSunlightJson(String jsonContent) throws JSONException {
+        String sunlight = null;
+
+        if (jsonContent != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(jsonContent);
+
+                if (jsonObject.has("sunlight")) {
+                    JSONArray sunlightArray = jsonObject.getJSONArray("sunlight");
+
+                    if (sunlightArray.length() > 0) {
+                        sunlight = sunlightArray.getString(0);
+                        return sunlight;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return sunlight;
+    }
+
 }
 
