@@ -17,6 +17,7 @@ public class PlantDetailsFragment extends Fragment {
 
     private ImageView openCalendar;
     private TextView plantNameView, sunlightInfo, waterInfo;
+    String plantName;
 
     public PlantDetailsFragment() {
         // Required empty public constructor
@@ -27,31 +28,35 @@ public class PlantDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_plant_details, container, false);
 
-        plantNameView = view.findViewById(R.id.plantNameTextView);
+        plantNameView = view.findViewById(R.id.plantNameView);
         sunlightInfo = view.findViewById(R.id.sunlightInfo);
         waterInfo = view.findViewById(R.id.waterInfo);
-
         openCalendar = view.findViewById(R.id.calenderImageView);
-
-        openCalendar.setOnClickListener(view1 -> {
-            CalendarFragment calendarFragment = new CalendarFragment();
-
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.plant_details, calendarFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        });
 
         // Retrieve data from the Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
-            String plantName = bundle.getString("plantName");
+            plantName = bundle.getString("plantName");
             // display plant name in text view
             plantNameView.setText(plantName);
         }
 
         getSunlight();
         getWateringInfo();
+
+        openCalendar.setOnClickListener(view1 -> {
+            CalendarFragment calendarFragment = new CalendarFragment();
+
+            // pass plant name to calendar fragment
+            Bundle bundle2 = new Bundle();
+            bundle2.putString("plantName", plantName);
+            calendarFragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.plant_details, calendarFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
 
         return view;
     }
