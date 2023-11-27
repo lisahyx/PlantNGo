@@ -98,5 +98,30 @@ public class JsonReader {
         return sunlight;
     }
 
+    public String parseWateringJson(String jsonContent) throws JSONException {
+        String wateringInfo = null;
+
+        if (jsonContent != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(jsonContent);
+
+                if (jsonObject.has("watering_general_benchmark")) {
+                    JSONObject wateringObject = jsonObject.getJSONObject("watering_general_benchmark");
+
+                    if (wateringObject.has("value") && wateringObject.has("unit")) {
+                        String value = wateringObject.getString("value");
+                        String unit = wateringObject.getString("unit");
+
+                        wateringInfo = "Every " + value + " " + unit;
+                        return wateringInfo;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return wateringInfo;
+    }
+
 }
 

@@ -1,12 +1,10 @@
 package com.example.plantngo;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +16,7 @@ import org.json.JSONException;
 public class PlantDetailsFragment extends Fragment {
 
     private ImageView openCalendar;
-    private TextView plantNameView, sunlightInfo;
+    private TextView plantNameView, sunlightInfo, waterInfo;
 
     public PlantDetailsFragment() {
         // Required empty public constructor
@@ -31,6 +29,7 @@ public class PlantDetailsFragment extends Fragment {
 
         plantNameView = view.findViewById(R.id.plantNameTextView);
         sunlightInfo = view.findViewById(R.id.sunlightInfo);
+        waterInfo = view.findViewById(R.id.waterInfo);
 
         openCalendar = view.findViewById(R.id.calenderImageView);
 
@@ -52,6 +51,7 @@ public class PlantDetailsFragment extends Fragment {
         }
 
         getSunlight();
+        getWateringInfo();
 
         return view;
     }
@@ -62,8 +62,26 @@ public class PlantDetailsFragment extends Fragment {
         if (jsonContent != null) {
             try {
                 String sunlight = jsonReader.parseSunlightJson(jsonContent);
+
                 if (sunlight != null) {
                     sunlightInfo.setText(sunlight);
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void getWateringInfo() {
+        JsonReader jsonReader = new JsonReader();
+        String jsonContent = jsonReader.readJsonFile(getContext(), R.raw.plant_care_api_output);
+
+        if (jsonContent != null) {
+            try {
+                String wateringInfo = jsonReader.parseWateringJson(jsonContent);
+
+                if (wateringInfo != null) {
+                    waterInfo.setText(wateringInfo);
                 }
             } catch (JSONException e) {
                 throw new RuntimeException(e);
