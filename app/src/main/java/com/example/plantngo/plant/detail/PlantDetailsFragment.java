@@ -1,5 +1,7 @@
-package com.example.plantngo;
+package com.example.plantngo.plant.detail;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,8 +10,15 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.plantngo.R;
+import com.example.plantngo.jsonparsing.JsonReader;
+import com.example.plantngo.plant.HomeFragment;
+import com.example.plantngo.storage.SharedPreferencesStorage;
 
 import org.json.JSONException;
 
@@ -17,7 +26,11 @@ public class PlantDetailsFragment extends Fragment {
 
     private ImageView openCalendar;
     private TextView plantNameView, sunlightInfo, waterInfo;
+
+    private Button removeButton;
     String plantName;
+
+
 
     public PlantDetailsFragment() {
         // Required empty public constructor
@@ -32,11 +45,14 @@ public class PlantDetailsFragment extends Fragment {
         sunlightInfo = view.findViewById(R.id.sunlightInfo);
         waterInfo = view.findViewById(R.id.waterInfo);
         openCalendar = view.findViewById(R.id.calenderImageView);
+        removeButton = view.findViewById(R.id.remove_plant_button);
 
         // Retrieve data from the Bundle
         Bundle bundle = getArguments();
         if (bundle != null) {
             plantName = bundle.getString("plantName");
+        }
+        if (plantName != null) {
             // display plant name in text view
             plantNameView.setText(plantName);
         }
@@ -56,6 +72,10 @@ public class PlantDetailsFragment extends Fragment {
             transaction.replace(R.id.plant_details, calendarFragment);
             transaction.addToBackStack(null);
             transaction.commit();
+        });
+
+        removeButton.setOnClickListener(view12 -> {
+            removePlantFromGarden(plantName);
         });
 
         return view;
@@ -92,5 +112,45 @@ public class PlantDetailsFragment extends Fragment {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public void removePlantFromGarden (String plantName) {
+        // Create the object of AlertDialog Builder class
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set the message show for the Alert time
+        builder.setMessage("Remove " + plantName + " from Garden?");
+
+        // Set Cancelable false for when the user clicks on the outside the Dialog Box then it will remain show
+        builder.setCancelable(false);
+
+        builder.setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, which) -> {
+            SharedPreferencesStorage sharedPreferencesStorage = new SharedPreferencesStorage();
+            sharedPreferencesStorage.deletePlantNameFromSharedPreferences(requireContext(), plantName);
+            Toast.makeText(getContext(),"Plant removed from garden", Toast.LENGTH_SHORT).show();
+
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+
+            HomeFragment homeFragment = new HomeFragment();
+            transaction.replace(R.id.plant_details, homeFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+            Toast.makeText(requireContext(),"Please refresh page", Toast.LENGTH_SHORT).show();
+
+            // Close the current fragment
+            getParentFragmentManager().beginTransaction().remove(PlantDetailsFragment.this).commit();
+
+        });
+
+        // Set the Negative button with No name Lambda OnClickListener method is use of DialogInterface interface.
+        builder.setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, which) -> {
+            // If user click no then dialog box is canceled.
+            dialog.cancel();
+        });
+
+        // Create the Alert dialog
+        AlertDialog alertDialog = builder.create();
+        // Show the Alert Dialog box
+        alertDialog.show();
     }
 }
