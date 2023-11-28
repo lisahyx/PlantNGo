@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,17 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class CalendarFragment extends Fragment {
 
@@ -35,6 +42,10 @@ public class CalendarFragment extends Fragment {
     private String stringDateSelected, plantName;
     private TextView plantNameView;
     private DatabaseReference databaseReference;
+
+    FirebaseAuth fAuth = FirebaseAuth.getInstance();
+    FirebaseUser fUser = fAuth.getCurrentUser();
+    String userId = fUser.getUid();
 
     public CalendarFragment() {
         // Required empty public constructor
@@ -50,6 +61,9 @@ public class CalendarFragment extends Fragment {
         closeButton = view.findViewById(R.id.close);
         calenderEditText = view.findViewById(R.id.calenderEditText);
         scheduleWateringButton = view.findViewById(R.id.scheduleWateringButton);
+        databaseReference = FirebaseDatabase.
+                getInstance("https://plantngo-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("users").child("userID: " + userId);
 
         // Retrieve data from the Bundle
         Bundle bundle = getArguments();
@@ -63,7 +77,6 @@ public class CalendarFragment extends Fragment {
             stringDateSelected = Integer.toString(i) + Integer.toString(i1+1) + Integer.toString(i2);
             calendarClicked();
         });
-        databaseReference = FirebaseDatabase.getInstance("https://plantngo-app-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Calendar");
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,25 +90,28 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        scheduleWateringButton.setOnClickListener(v ->
-                databaseReference.child(stringDateSelected).setValue(calenderEditText.getText().toString())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(getContext(), "Added to calendar", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("CalendarFragment", "Error adding to calendar", e);
-                    }
-                }));
+        scheduleWateringButton.setOnClickListener(v -> {
+            String scheduledEvent = calenderEditText.getText().toString();
+
+            if(stringDateSelected == null) {
+                // If empty, set it to today's date
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+                stringDateSelected = sdf.format(new Date());
+            }
+
+            if (!TextUtils.isEmpty(scheduledEvent)) {
+                databaseReference.child("calendar").child(plantName).child(stringDateSelected).setValue(scheduledEvent);
+                Toast.makeText(getContext(), "Added to calendar", Toast.LENGTH_SHORT).show();
+            } else {
+                // Handle the case where the selected date is empty
+                Toast.makeText(getContext(), "Please select a date", Toast.LENGTH_SHORT).show();
+            }
+        });
         return view;
     }
 
     private void calendarClicked(){
-        databaseReference.child(stringDateSelected).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("calendar").child(plantName).child(stringDateSelected).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null){
