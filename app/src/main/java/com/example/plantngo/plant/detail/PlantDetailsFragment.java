@@ -18,7 +18,9 @@ import android.widget.Toast;
 import com.example.plantngo.R;
 import com.example.plantngo.jsonparsing.JsonReader;
 import com.example.plantngo.plant.HomeFragment;
+import com.example.plantngo.storage.RealtimeDatabaseStorage;
 import com.example.plantngo.storage.SharedPreferencesStorage;
+import com.google.firebase.database.DatabaseReference;
 
 import org.json.JSONException;
 
@@ -30,7 +32,7 @@ public class PlantDetailsFragment extends Fragment {
     private Button removeButton;
     String plantName;
 
-
+    private DatabaseReference databaseReference;
 
     public PlantDetailsFragment() {
         // Required empty public constructor
@@ -46,6 +48,9 @@ public class PlantDetailsFragment extends Fragment {
         waterInfo = view.findViewById(R.id.waterInfo);
         openCalendar = view.findViewById(R.id.calenderImageView);
         removeButton = view.findViewById(R.id.remove_plant_button);
+
+        RealtimeDatabaseStorage realtimeDatabaseStorage = new RealtimeDatabaseStorage();
+        databaseReference = realtimeDatabaseStorage.getDatabaseReference();
 
         // Retrieve data from the Bundle
         Bundle bundle = getArguments();
@@ -89,6 +94,7 @@ public class PlantDetailsFragment extends Fragment {
                 String sunlight = jsonReader.parseSunlightJson(jsonContent);
 
                 if (sunlight != null) {
+                    databaseReference.child("plants").child(plantName).child("plantCare").child("Sunlight").setValue(sunlight);
                     sunlightInfo.setText(sunlight);
                 }
             } catch (JSONException e) {
@@ -106,6 +112,7 @@ public class PlantDetailsFragment extends Fragment {
                 String wateringInfo = jsonReader.parseWateringJson(jsonContent);
 
                 if (wateringInfo != null) {
+                    databaseReference.child("plants").child(plantName).child("plantCare").child("Water").setValue(wateringInfo);
                     waterInfo.setText(wateringInfo);
                 }
             } catch (JSONException e) {
