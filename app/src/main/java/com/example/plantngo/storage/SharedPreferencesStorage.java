@@ -1,4 +1,4 @@
-package com.example.plantngo;
+package com.example.plantngo.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SharedPreferencesStorage {
+
+    RealtimeDatabaseStorage realtimeDatabase = new RealtimeDatabaseStorage();
 
     // Save plant names to SharedPreferences
     public void savePlantNamesToSharedPreferences(Context context, List<String> plantNames) {
@@ -63,6 +65,8 @@ public class SharedPreferencesStorage {
         // Save the updated list to SharedPreferences
         storage.savePlantNamesToSharedPreferences(context, retrievedPlantNames);
 
+        realtimeDatabase.savePlantNamesToRealtimeDatabase(retrievedPlantNames);
+
         // Log all plant names
         storage.displayAllPlantNames(context);
     }
@@ -80,8 +84,6 @@ public class SharedPreferencesStorage {
 
     // Delete a plant name from SharedPreferences
     public void deletePlantNameFromSharedPreferences(Context context, String plantName) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("PlantPreferences", Context.MODE_PRIVATE);
-
         // Retrieve the existing list of plant names
         List<String> plantNames = getPlantNamesFromSharedPreferences(context);
 
@@ -91,6 +93,8 @@ public class SharedPreferencesStorage {
 
             // Save the updated list to SharedPreferences
             savePlantNamesToSharedPreferences(context, plantNames);
+
+            realtimeDatabase.deletePlantNameFromRealtimeDatabase(plantName);
 
             // Log all plant names after deletion
             displayAllPlantNames(context);
