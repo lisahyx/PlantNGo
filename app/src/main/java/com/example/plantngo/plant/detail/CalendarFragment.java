@@ -1,6 +1,5 @@
-package com.example.plantngo;
+package com.example.plantngo.plant.detail;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.plantngo.R;
+import com.example.plantngo.storage.RealtimeDatabaseStorage;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
@@ -43,10 +38,6 @@ public class CalendarFragment extends Fragment {
     private TextView plantNameView;
     private DatabaseReference databaseReference;
 
-    FirebaseAuth fAuth = FirebaseAuth.getInstance();
-    FirebaseUser fUser = fAuth.getCurrentUser();
-    String userId = fUser.getUid();
-
     public CalendarFragment() {
         // Required empty public constructor
     }
@@ -61,9 +52,9 @@ public class CalendarFragment extends Fragment {
         closeButton = view.findViewById(R.id.close);
         calenderEditText = view.findViewById(R.id.calenderEditText);
         scheduleWateringButton = view.findViewById(R.id.scheduleWateringButton);
-        databaseReference = FirebaseDatabase.
-                getInstance("https://plantngo-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("users").child("userID: " + userId);
+
+        RealtimeDatabaseStorage realtimeDatabaseStorage = new RealtimeDatabaseStorage();
+        databaseReference = realtimeDatabaseStorage.getDatabaseReference();
 
         // Retrieve data from the Bundle
         Bundle bundle = getArguments();
@@ -81,12 +72,8 @@ public class CalendarFragment extends Fragment {
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PlantDetailsFragment plantDetailsFragment = new PlantDetailsFragment();
-
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                transaction.replace(R.id.calendar_fragment, plantDetailsFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                // Close the current fragment
+                getParentFragmentManager().beginTransaction().remove(CalendarFragment.this).commit();
             }
         });
 
@@ -100,7 +87,7 @@ public class CalendarFragment extends Fragment {
             }
 
             if (!TextUtils.isEmpty(scheduledEvent)) {
-                databaseReference.child("calendar").child(plantName).child(stringDateSelected).setValue(scheduledEvent);
+                databaseReference.child("plants").child(plantName).child("calendar").child(stringDateSelected).setValue(scheduledEvent);
                 Toast.makeText(getContext(), "Added to calendar", Toast.LENGTH_SHORT).show();
             } else {
                 // Handle the case where the selected date is empty
@@ -111,7 +98,7 @@ public class CalendarFragment extends Fragment {
     }
 
     private void calendarClicked(){
-        databaseReference.child("calendar").child(plantName).child(stringDateSelected).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.child("plants").child(plantName).child("calendar").child(stringDateSelected).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null){
