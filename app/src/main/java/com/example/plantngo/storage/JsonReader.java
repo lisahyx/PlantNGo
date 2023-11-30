@@ -1,24 +1,35 @@
-package com.example.plantngo;
+package com.example.plantngo.storage;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * JsonReader class provides methods to read and parse JSON files.
+ */
 public class JsonReader {
+    private static Long time;
 
+    /**
+     * Constructor to initialize the notification time with the current system time.
+     */
+    public JsonReader() {
+        time = System.currentTimeMillis();
+    }
+
+    /**
+     * Reads the content of a JSON file from the specified resource.
+     *
+     * @param context    The application context.
+     * @param resourceId The resource ID of the JSON file.
+     * @return The content of the JSON file as a string.
+     */
     public String readJsonFile(Context context, int resourceId) {
         try {
             // Open the resource using getResourceAsStream
@@ -46,6 +57,13 @@ public class JsonReader {
         }
     }
 
+    /**
+     * Parses JSON content to extract the scientific name of a plant.
+     *
+     * @param jsonContent The JSON content to be parsed.
+     * @return The scientific name of the plant.
+     * @throws JSONException If an error occurs while parsing JSON.
+     */
     public String parsePlantNameJson(String jsonContent) throws JSONException {
         String scientificName = null;
 
@@ -76,6 +94,13 @@ public class JsonReader {
         return scientificName;
     }
 
+    /**
+     * Parses JSON content to extract sunlight information for a plant.
+     *
+     * @param jsonContent The JSON content to be parsed.
+     * @return Sunlight information for the plant.
+     * @throws JSONException If an error occurs while parsing JSON.
+     */
     public String parseSunlightJson(String jsonContent) throws JSONException {
         String sunlight = null;
 
@@ -98,6 +123,13 @@ public class JsonReader {
         return sunlight;
     }
 
+    /**
+     * Parses JSON content to extract watering information for a plant.
+     *
+     * @param jsonContent The JSON content to be parsed.
+     * @return Watering information for the plant.
+     * @throws JSONException If an error occurs while parsing JSON.
+     */
     public String parseWateringJson(String jsonContent) throws JSONException {
         String wateringInfo = null;
 
@@ -113,6 +145,11 @@ public class JsonReader {
                         String unit = wateringObject.getString("unit");
 
                         wateringInfo = "Every " + value + " " + unit;
+
+                        // if unit is in days, convert value to milliseconds
+                        long intervalMillis = Long.parseLong(value) * 24 * 60 * 60 * 1000;
+                        setNotificationTime(intervalMillis);
+
                         return wateringInfo;
                     }
                 }
@@ -123,5 +160,21 @@ public class JsonReader {
         return wateringInfo;
     }
 
-}
+    /**
+     * Sets the notification time interval.
+     *
+     * @param time The notification time interval in milliseconds.
+     */
+    public void setNotificationTime(Long time) {
+        JsonReader.time = time;
+    }
 
+    /**
+     * Gets the notification time interval.
+     *
+     * @return The notification time interval in milliseconds.
+     */
+    public static Long getNotificationTime() {
+        return time;
+    }
+}
