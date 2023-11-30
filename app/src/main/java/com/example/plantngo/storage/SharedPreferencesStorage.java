@@ -12,11 +12,21 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The SharedPreferencesStorage class provides methods to interact with SharedPreferences for plant data storage.
+ */
 public class SharedPreferencesStorage {
 
+    // Instance of RealtimeDatabaseStorage for additional interactions with the Realtime Database
     RealtimeDatabaseStorage realtimeDatabase = new RealtimeDatabaseStorage();
 
-    // Save plant names to SharedPreferences
+    /**
+     * Saves a list of plant names to SharedPreferences for a specific user.
+     *
+     * @param context    The application context.
+     * @param userId     The unique identifier of the user.
+     * @param plantNames The list of plant names to be saved.
+     */
     public void savePlantNamesToSharedPreferences(Context context, String userId, List<String> plantNames) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("PlantPreferences_" + userId, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -28,7 +38,13 @@ public class SharedPreferencesStorage {
         editor.apply();
     }
 
-    // Retrieve plant names from SharedPreferences
+    /**
+     * Retrieves a list of plant names from SharedPreferences for a specific user.
+     *
+     * @param context The application context.
+     * @param userId  The unique identifier of the user.
+     * @return The list of plant names retrieved from SharedPreferences.
+     */
     public List<String> getPlantNamesFromSharedPreferences(Context context, String userId) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("PlantPreferences_" + userId, Context.MODE_PRIVATE);
 
@@ -40,7 +56,13 @@ public class SharedPreferencesStorage {
         return new Gson().fromJson(plantNamesJson, listType);
     }
 
-    // Add a new plant name to the existing list in SharedPreferences
+    /**
+     * Adds a new plant name to the existing list in SharedPreferences for a specific user.
+     *
+     * @param context   The application context.
+     * @param userId    The unique identifier of the user.
+     * @param plantName The name of the plant to be added.
+     */
     public void addPlantNameToSharedPreferences(Context context, String userId, String plantName) {
         // Save plant name
         SharedPreferencesStorage storage = new SharedPreferencesStorage();
@@ -57,7 +79,7 @@ public class SharedPreferencesStorage {
             retrievedPlantNames = new ArrayList<>();
             retrievedPlantNames.add(plantName);
             Toast.makeText(context, "Plant Added to Garden", Toast.LENGTH_SHORT).show();
-        } else if (retrievedPlantNames != null) {
+        } else {
             retrievedPlantNames.add(plantName);
             Toast.makeText(context, "Plant Added to Garden", Toast.LENGTH_SHORT).show();
         }
@@ -65,13 +87,19 @@ public class SharedPreferencesStorage {
         // Save the updated list to SharedPreferences
         storage.savePlantNamesToSharedPreferences(context, userId, retrievedPlantNames);
 
+        // Save the updated list to Realtime Database
         realtimeDatabase.savePlantNamesToRealtimeDatabase(retrievedPlantNames);
 
         // Log all plant names
         storage.displayAllPlantNames(context, userId);
     }
 
-    // Display all plant names stored in SharedPreferences
+    /**
+     * Displays all plant names stored in SharedPreferences for a specific user.
+     *
+     * @param context The application context.
+     * @param userId  The unique identifier of the user.
+     */
     public void displayAllPlantNames(Context context, String userId) {
         List<String> plantNames = getPlantNamesFromSharedPreferences(context, userId);
 
@@ -82,7 +110,13 @@ public class SharedPreferencesStorage {
         }
     }
 
-    // Delete a plant name from SharedPreferences
+    /**
+     * Deletes a plant name from SharedPreferences for a specific user.
+     *
+     * @param context   The application context.
+     * @param userId    The unique identifier of the user.
+     * @param plantName The name of the plant to be deleted.
+     */
     public void deletePlantNameFromSharedPreferences(Context context, String userId, String plantName) {
         // Retrieve the existing list of plant names
         List<String> plantNames = getPlantNamesFromSharedPreferences(context, userId);
@@ -94,6 +128,7 @@ public class SharedPreferencesStorage {
             // Save the updated list to SharedPreferences
             savePlantNamesToSharedPreferences(context, userId, plantNames);
 
+            // Delete the plant name from the Realtime Database
             realtimeDatabase.deletePlantNameFromRealtimeDatabase(plantName);
 
             // Log all plant names after deletion
