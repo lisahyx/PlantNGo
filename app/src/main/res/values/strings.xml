@@ -10,8 +10,8 @@
     <string name="password">Password</string>
     <string name="encrypted_password">******</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="login">Login</string>
-    <string name="no_account">Don\'t Have an account?</string>
+    <string name="login">Log In</string>
+    <string name="no_account">Don\'t have an account?</string>
     <string name="sign_up">SIGN UP</string>
     <string name="or">or</string>
     <string name="google_login">Login With Google</string>
@@ -33,4 +33,22 @@
         <item>zinc</item>
         <item>pippin</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="log_out">Log Out</string>
+    <string name="settings">Settings</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

@@ -1,0 +1,39 @@
+{
+  "query": {
+    "project": "best",
+    "images": [
+      "buffer_code_image_1",
+      "buffer_code_image_2"
+    ],
+    "organs": [
+      "flower",
+      "leaf"
+    ]
+  },
+  "language": "en",
+  "preferedReferential": "useful",
+  "results": [
+    {
+      "score": 0.9952006530761719,
+      "species": {
+        "scientificNameWithoutAuthor": "Lily",
+        "scientificNameAuthorship": "L.",
+        "genus": {
+          "scientificNameWithoutAuthor": "Hibiscus",
+          "scientificNameAuthorship": "L."
+        },
+        "family": {
+          "scientificNameWithoutAuthor": "Malvaceae",
+          "scientificNameAuthorship": "Juss."
+        },
+        "commonNames": [
+          "Chinese hibiscus",
+          "Hawaiian hibiscus",
+          "Hibiscus"
+        ]
+      }
+    }
+  ],
+  "remainingIdentificationRequests": 1228
+}
+

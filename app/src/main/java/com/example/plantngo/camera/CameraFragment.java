@@ -3,14 +3,12 @@ package com.example.plantngo.camera;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +34,8 @@ import com.example.plantngo.R;
 import com.example.plantngo.authentication.LoginActivity;
 import com.example.plantngo.storage.JsonReader;
 import com.example.plantngo.storage.SharedPreferencesStorage;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -55,7 +50,7 @@ public class CameraFragment extends Fragment {
     public static final int CAMERA_REQUEST_CODE = 102;
     public static final int GALLERY_REQUEST_CODE = 105;
 
-    private ImageView selectedImage;
+    private ImageView displayImageView;
     public String addPlantName;
     private String imagesFilesPaths;
     private StorageReference storageReference;
@@ -66,9 +61,9 @@ public class CameraFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_camera, container, false);
 
         // Initialize UI elements
-        Button cameraButton = view.findViewById(R.id.cameraButton);
-        Button galleryButton = view.findViewById(R.id.galleryButton);
-        selectedImage = view.findViewById(R.id.displayImageView);
+        Button cameraButton = view.findViewById(R.id.camera_button);
+        Button galleryButton = view.findViewById(R.id.gallery_button);
+        displayImageView = view.findViewById(R.id.display_imageView);
 
         // Initialize Firebase storage reference
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -180,7 +175,7 @@ public class CameraFragment extends Fragment {
 
         imageRef.putFile(contentUri)
                 .addOnSuccessListener(taskSnapshot -> {
-                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(selectedImage));
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).into(displayImageView));
                     Toast.makeText(getContext(), "Image is Uploaded", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Upload Failed", Toast.LENGTH_SHORT).show());

@@ -2,10 +2,6 @@ package com.example.plantngo.plant;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +10,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.plantngo.R;
 import com.example.plantngo.authentication.LoginActivity;
@@ -79,17 +78,11 @@ public class PlantDetailsFragment extends Fragment {
 
         setNotificationButtonImage(notificationReceiver);
 
-        notificationButton.setOnClickListener(v -> {
-            setNotification(notificationReceiver);
-        });
+        notificationButton.setOnClickListener(v -> setNotification(notificationReceiver));
 
-        calendarImageView.setOnClickListener(v -> {
-            openCalender(bundle);
-        });
+        calendarImageView.setOnClickListener(v -> openCalender(bundle));
 
-        removeButton.setOnClickListener(v -> {
-            removePlantFromGarden(plantName);
-        });
+        removeButton.setOnClickListener(v -> removePlantFromGarden(plantName));
 
         return view;
     }
@@ -204,7 +197,7 @@ public class PlantDetailsFragment extends Fragment {
      *
      * @param plantName The name of the plant to be removed.
      */
-    public void removePlantFromGarden (String plantName) {
+    public void removePlantFromGarden(String plantName) {
         // Create the object of AlertDialog Builder class
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -217,21 +210,19 @@ public class PlantDetailsFragment extends Fragment {
         builder.setPositiveButton("Yes", (dialog, which) -> {
             SharedPreferencesStorage sharedPreferencesStorage = new SharedPreferencesStorage();
             sharedPreferencesStorage.deletePlantNameFromSharedPreferences(requireContext(), userId, plantName);
-            Toast.makeText(getContext(),"Plant removed from garden", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Plant removed from garden", Toast.LENGTH_SHORT).show();
 
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
             transaction.replace(R.id.plant_details, new HomeFragment());
             transaction.commit();
-            Toast.makeText(requireContext(),"Please refresh page", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Please refresh page", Toast.LENGTH_SHORT).show();
 
             // Close the current fragment
             getParentFragmentManager().beginTransaction().remove(PlantDetailsFragment.this).commit();
 
         });
 
-        builder.setNegativeButton("No", (dialog, which) -> {
-            dialog.cancel();
-        });
+        builder.setNegativeButton("No", (dialog, which) -> dialog.cancel());
 
         // Create the Alert dialog
         AlertDialog alertDialog = builder.create();

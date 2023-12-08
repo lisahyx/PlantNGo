@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "scientific_name": [
+    "Sunflower"
+  ],
+  "watering_general_benchmark": {
+    "value": "5",
+    "unit": "days"
+  },
+  "sunlight": [
+    "Part shade"
+  ]
+}

@@ -3,53 +3,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CalendarFragment"
-    android:background="@color/background">
+    tools:context=".calendar.CalendarFragment"
+    android:id="@+id/calendar_fragment"
+    android:background="@color/primary_green">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100dp"
         android:orientation="vertical"
         android:layout_margin="30dp">
 
-        <TextView
-            android:id="@+id/plantNameTextView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
-            android:text="Plant Name" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/plant_name_textView"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:text="Plant Name"
+                android:textColor="@color/white"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/close_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/baseline_close_24" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/dateAddedTextView"
+            android:id="@+id/date_added_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Date Added" />
+            android:text="Date Added"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_gravity="bottom"
+        android:background="@color/background"
+        android:orientation="vertical"
+        android:padding="30dp" >
 
         <CalendarView
-            android:id="@+id/calendarView"
+            android:id="@+id/calendar_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"/>
+            android:layout_gravity="center" />
 
         <EditText
-            android:id="@+id/calenderEditText"
+            android:id="@+id/calendar_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:inputType="text"
-            android:layout_marginTop="10dp"
-            android:text="Name" />
+            android:text="Watered" />
 
         <Button
-            android:id="@+id/scheduleWateringButton"
+            android:id="@+id/schedule_watering_button"
             style="@style/CustomButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Schedule Watering"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"/>
-
+            android:layout_marginTop="10dp"
+            android:text="Schedule Event" />
     </LinearLayout>
-
 </FrameLayout>

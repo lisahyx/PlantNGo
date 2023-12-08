@@ -27,6 +27,7 @@ public class PlantNetAPIAsyncTask extends AsyncTask<Uri, Void, String> {
             try {
                 // Convert Uri to File
                 File imageFile = new File(Objects.requireNonNull(imageUri.getPath()));
+                Log.d("PlantNetAPIAsyncTask", "Image URI path: " + imageUri.getPath());
 
                 // Implement your PlantNet API logic here
 

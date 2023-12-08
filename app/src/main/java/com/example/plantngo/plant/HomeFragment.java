@@ -87,7 +87,7 @@ public class HomeFragment extends Fragment implements RecyclerViewInterface {
         }
 
         // Create and set the adapter for the RecyclerView
-        GardenPlantsAdapter gardenPlantsAdapter = new GardenPlantsAdapter(requireContext(), plants, this);
+        PlantAdapter gardenPlantsAdapter = new PlantAdapter(requireContext(), plants, this);
         gardenPlantsRecyclerView.setAdapter(gardenPlantsAdapter);
 
         // Set a GridLayoutManager for the RecyclerView

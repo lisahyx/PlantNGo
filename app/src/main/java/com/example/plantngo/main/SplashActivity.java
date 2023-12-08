@@ -1,11 +1,16 @@
-package com.example.plantngo;
+package com.example.plantngo.main;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.example.plantngo.R;
+import com.example.plantngo.authentication.LoginActivity;
+
+@SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -20,6 +25,6 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        },2000);
+        },1500);
     }
 }
