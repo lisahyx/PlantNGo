@@ -15,8 +15,13 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
+/**
+ * The RegisterActivity class handles user registration, email verification,
+ * and navigation to the login activity.
+ */
 public class RegisterActivity extends AppCompatActivity {
 
+    // UI elements
     private EditText newEmailEditText;
     private EditText newPasswordEditText;
     private EditText newConfirmPasswordEditText;
@@ -24,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView verifyMsg;
     private Button verifyEmailButton;
 
+    // Firebase Authentication instance
     private FirebaseAuth fAuth;
 
     @Override
@@ -93,6 +99,10 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sends a verification email to the user's registered email address.
+     * If successful, displays a success message and navigates to the login activity.
+     */
     private void sendEmailVerification() {
         Objects.requireNonNull(fAuth.getCurrentUser()).sendEmailVerification()
                 .addOnSuccessListener(unused -> {
@@ -105,6 +115,10 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Failed to send verification email: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
+    /**
+     * Navigates to the login activity.
+     */
     private void navigateToLoginActivity() {
         Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
         startActivity(loginIntent);
