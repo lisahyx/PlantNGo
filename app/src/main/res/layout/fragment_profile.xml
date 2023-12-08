@@ -5,32 +5,41 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:id="@+id/fragment_profile"
-    tools:context=".ProfileFragment">
+    tools:context=".authentication.ProfileFragment">
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="30dp"
-        tools:layout_editor_absoluteX="-30dp"
-        tools:layout_editor_absoluteY="339dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="30dp">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/profile"
+            android:textStyle="bold"
+            android:textSize="30sp"/>
 
         <ImageButton
             android:id="@+id/settings_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/settings_foreground"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="end|top"
             android:background="@color/background"
+            android:contentDescription="@string/settings"
             android:scaleX="0.6"
             android:scaleY="0.6"
-            android:contentDescription="@string/settings" />
-
-        <Button
-            android:id="@+id/logout_button"
-            style="@style/CustomButton"
-            android:tag="logout_button"
-            android:text="@string/log_out"/>
+            android:src="@drawable/settings_foreground" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/logout_button"
+        style="@style/CustomButton"
+        android:tag="logout_button"
+        android:text="@string/log_out"
+        android:layout_margin="30dp"
+        android:layout_gravity="bottom"/>
 </FrameLayout>
