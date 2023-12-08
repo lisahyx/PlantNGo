@@ -1,7 +1,5 @@
 package com.example.plantngo.authentication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.plantngo.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -97,13 +97,18 @@ public class RegisterActivity extends AppCompatActivity {
         Objects.requireNonNull(fAuth.getCurrentUser()).sendEmailVerification()
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(RegisterActivity.this, "Verification Email Sent", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                    finish();
+                    fAuth.signOut();
+                    navigateToLoginActivity();
                 })
                 .addOnFailureListener(e -> {
                     // Handle the failure to send the verification email
                     Toast.makeText(RegisterActivity.this, "Failed to send verification email: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+    private void navigateToLoginActivity() {
+        Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 }
 
