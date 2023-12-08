@@ -3,7 +3,6 @@ package com.example.plantngo.settings;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import com.example.plantngo.R;
 import com.example.plantngo.authentication.LoginActivity;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
@@ -55,6 +53,8 @@ public class SettingsFragment extends Fragment {
         // Button to delete user account
         Button deleteUserButton = view.findViewById(R.id.delete_user_button);
 
+        delete_alert = new AlertDialog.Builder(requireContext());
+
         // Set onClickListener for the delete user button
         deleteUserButton.setOnClickListener(v -> delete_alert.setTitle("Delete Account Permanently?")
                 .setMessage("Are you sure?")
@@ -67,12 +67,9 @@ public class SettingsFragment extends Fragment {
                                 fAuth.signOut();
                                 startActivity(new Intent(getContext(), LoginActivity.class));
                             })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    // Display an error message if the deletion fails
-                                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                            .addOnFailureListener(e -> {
+                                // Display an error message if the deletion fails
+                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                 })
                 .setNegativeButton("Cancel", null)
