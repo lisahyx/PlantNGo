@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.plantngo.R;
+import com.example.plantngo.storage.JsonReader;
 import com.example.plantngo.storage.RealtimeDatabaseStorage;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +36,7 @@ import java.util.Locale;
  */
 public class CalendarFragment extends Fragment {
 
+    private TextView dateAddedTextView;
     private EditText calendarEditText;
     private String stringDateSelected, plantName;
     private DatabaseReference databaseReference;
@@ -56,6 +61,7 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
+        dateAddedTextView = view.findViewById(R.id.date_added_textView);
         TextView plantNameTextView = view.findViewById(R.id.plant_name_textView);
         CalendarView calendar = view.findViewById(R.id.calendar_view);
         ImageView closeButton = view.findViewById(R.id.close_button);
@@ -81,6 +87,27 @@ public class CalendarFragment extends Fragment {
         closeButton.setOnClickListener(view1 -> closeFragment());
 
         scheduleWateringButton.setOnClickListener(v -> scheduleWatering());
+
+        // Retrieve the date added
+        databaseReference.child("plants").child(plantName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Retrieve the value of "dateAdded"
+                    String dateAdded = dataSnapshot.child("dateAdded").getValue(String.class);
+
+                    // Set value
+                    if (dateAdded != null) {
+                        dateAddedTextView.setText(dateAdded);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         return view;
     }
@@ -154,6 +181,16 @@ public class CalendarFragment extends Fragment {
             calendarEditText.setText(snapshot.getValue().toString());
         } else {
             calendarEditText.setText(null);
+        }
+    }
+
+    public void getDateAdded() {
+
+        String date;
+        date = String.valueOf(databaseReference.child("plants").child(plantName).child("dateAdded"));
+
+        if (date != null) {
+            dateAddedTextView.setText(date);
         }
     }
 }
