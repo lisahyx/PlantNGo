@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +17,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.plantngo.R;
-import com.example.plantngo.storage.JsonReader;
 import com.example.plantngo.storage.RealtimeDatabaseStorage;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -80,7 +76,7 @@ public class CalendarFragment extends Fragment {
         }
 
         calendar.setOnDateChangeListener((calendarView, i, i1, i2) -> {
-            stringDateSelected = Integer.toString(i) + Integer.toString(i1 + 1) + Integer.toString(i2);
+            stringDateSelected = i + Integer.toString(i1 + 1) + i2;
             calendarClicked();
         });
 
@@ -169,28 +165,5 @@ public class CalendarFragment extends Fragment {
     private void saveScheduledEvent(String scheduledEvent) {
         databaseReference.child("plants").child(plantName).child("calendar").child(stringDateSelected).setValue(scheduledEvent);
         Toast.makeText(getContext(), "Added to calendar", Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-     * Update the calendarEditText based on the retrieved data snapshot.
-     *
-     * @param snapshot Data snapshot containing the scheduled event.
-     */
-    private void updateCalendarEditText(DataSnapshot snapshot) {
-        if (snapshot.getValue() != null) {
-            calendarEditText.setText(snapshot.getValue().toString());
-        } else {
-            calendarEditText.setText(null);
-        }
-    }
-
-    public void getDateAdded() {
-
-        String date;
-        date = String.valueOf(databaseReference.child("plants").child(plantName).child("dateAdded"));
-
-        if (date != null) {
-            dateAddedTextView.setText(date);
-        }
     }
 }
