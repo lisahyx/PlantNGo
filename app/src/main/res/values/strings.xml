@@ -23,20 +23,9 @@
     <string name="home">Home</string>
     <string name="community">Community</string>
     <string name="profile">Profile</string>
-    <string-array name="cat_names">
-        <item>scribble</item>
-        <item>gucci</item>
-        <item>zinc</item>
-        <item>pippin</item>
-        <item>scribble</item>
-        <item>gucci</item>
-        <item>zinc</item>
-        <item>pippin</item>
-    </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="log_out">Log Out</string>
     <string name="settings">Settings</string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -51,4 +40,6 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="date_added">Date Added</string>
+    <string name="delete_account">Delete Account</string>
 </resources>
