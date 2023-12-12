@@ -1,4 +1,4 @@
-package com.example.plantngo;
+package api;
 
 import android.content.Context;
 import android.net.Uri;

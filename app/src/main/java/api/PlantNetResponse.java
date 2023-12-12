@@ -1,4 +1,4 @@
-package com.example.plantngo;
+package api;
 
 import com.google.gson.annotations.SerializedName;
 

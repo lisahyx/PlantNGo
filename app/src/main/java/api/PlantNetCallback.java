@@ -1,4 +1,4 @@
-package com.example.plantngo;
+package api;
 
 public interface PlantNetCallback {
     void onSuccess(String result);
