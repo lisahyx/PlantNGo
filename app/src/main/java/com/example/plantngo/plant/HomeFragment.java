@@ -110,7 +110,7 @@ public class HomeFragment extends Fragment implements RecyclerViewInterface {
 
         // Switch to the PlantDetailsFragment
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.home, plantDetailsFragment);
+        transaction.replace(R.id.fragment_home, plantDetailsFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -124,7 +124,7 @@ public class HomeFragment extends Fragment implements RecyclerViewInterface {
 
         // Switch to the CameraFragment
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.home, cameraFragment);
+        transaction.replace(R.id.fragment_home, cameraFragment);
         transaction.addToBackStack(null);
         transaction.commit();
 
